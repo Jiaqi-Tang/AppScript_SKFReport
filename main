@@ -1,0 +1,286 @@
+function createDelivered() {
+  
+  const columnFrom = "A";
+  const columnBody = "C";
+  const columnSentDate = "E";
+  var spreadSheetId='1mq49hIoSb0lSTDTRxXRhMglXpkPMvR8biznrNEX32uo'; // Spread Sheet Id for Daily TokenEx Tracking 2023
+  var sheetname = 'Sheet1'; // Spread Sheet Name of the Sheet to Modify
+  var ss = SpreadsheetApp.openById(spreadSheetId);
+  var dataSheet = ss.getSheetByName(sheetname);
+
+  var newSheetName = "Delivered"; // Replace "Duplicate Sheet" with the desired name for the duplicated sheet
+  ss.insertSheet(newSheetName);
+  var delivSheet = ss.getSheetByName(newSheetName);
+
+  var dateString = "2023-04-03"; // Replace with your string date
+  var date = new Date(dateString);
+
+  //var timezone = SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone();
+  var timezone = "Etc/UTC";
+
+  //startdate = Utilities.formatDate(startdate, timezone, "yyyy-MM-dd");
+  //Logger.log(date);
+  var today = new Date();
+  //today = Utilities.formatDate(today, timezone, "yyyy-MM-dd");
+  //Logger.log(today);
+  var differenceInDays = Math.floor((today.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+  //Logger.log(differenceInDays);
+
+
+  delivSheet.appendRow(["Row Labels",	"delivered", "undelivered",	"Grand Total"]);
+  var rowCount = 1; 
+  // For each full week
+  for(var i = 0; i < differenceInDays; i += 7){
+    //Logger.log("Start Date:" + date.getDate());
+    var weekStartDate = Utilities.formatDate(date, timezone, "yyyy-MM-dd");
+    var weekEndDate = new Date(date);
+    weekEndDate.setDate(weekEndDate.getDate() + 7);
+    weekEndDate = Utilities.formatDate(weekEndDate, timezone, "yyyy-MM-dd");
+    //Logger.log(weekEndDate);
+    Logger.log(date);
+
+    var weekLabel = weekStartDate + " - " + weekEndDate;
+    var weekDelivered = '=SUM(B' + (rowCount + 2) + ':B' + (rowCount + 8) + ')';
+    var weekUndelivered = '=SUM(C' + (rowCount + 2) + ':C' + (rowCount + 8) + ')';
+    var weekTotal = '=SUM(D' + (rowCount + 2) + ':D' + (rowCount + 8) + ')';
+
+    delivSheet.appendRow([weekLabel, weekDelivered, weekUndelivered, weekTotal]);
+    rowCount++;
+
+    for(var j = 0; j < 7; j++){
+      var dateFormat = Utilities.formatDate(date, timezone, "yyyy-MM-dd");
+      var delivered = '=COUNTIFs(Sheet1!E2:E, "=' + dateFormat +'", Sheet1!A2:A,+16474905177, Sheet1!D2:D, "delivered", Sheet1!C2:C, "*thanks for becoming a SickKids*")';
+      var undelivered = '=COUNTIFs(Sheet1!E2:E, "=' + dateFormat +'", Sheet1!A2:A,+16474905177, Sheet1!D2:D, "undelivered", Sheet1!C2:C, "*thanks for becoming a SickKids*")';
+      var total = '=COUNTIFs(Sheet1!E2:E, "=' + dateFormat +'", Sheet1!A2:A,+16474905177, Sheet1!C2:C, "*thanks for becoming a SickKids*")';
+
+      delivSheet.appendRow([dateFormat, delivered, undelivered, total]);
+
+      rowCount++;
+      date.setDate(date.getDate() + 1);
+
+    }
+    var range = delivSheet.getRange(rowCount - 6, 1, 7);
+    range.shiftRowGroupDepth(1);
+    var group = delivSheet.getRowGroup(rowCount - 6, 1);
+
+    // Collapses this group.
+    group.collapse();
+  }
+
+}
+
+function createRecieved() {
+  
+  const columnFrom = "A";
+  const columnBody = "C";
+  const columnSentDate = "E";
+  var spreadSheetId='1mq49hIoSb0lSTDTRxXRhMglXpkPMvR8biznrNEX32uo'; // Spread Sheet Id for Daily TokenEx Tracking 2023
+  var sheetname = 'Sheet1'; // Spread Sheet Name of the Sheet to Modify
+  var ss = SpreadsheetApp.openById(spreadSheetId);
+  var dataSheet = ss.getSheetByName(sheetname);
+
+  var newSheetName = "Received"; // Replace "Duplicate Sheet" with the desired name for the duplicated sheet
+  ss.insertSheet(newSheetName);
+  var receiSheet = ss.getSheetByName(newSheetName);
+
+  var dateString = "2023-04-03"; // Replace with your string date
+  var date = new Date(dateString);
+
+  var timezone = "Etc/UTC";
+
+  //Logger.log(date);
+  var today = new Date();
+  //today = Utilities.formatDate(today, timezone, "yyyy-MM-dd");
+  //Logger.log(today);
+  var differenceInDays = Math.floor((today.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+  //Logger.log(differenceInDays);
+
+
+  receiSheet.appendRow(["Row Labels", "received",	"Grand Total"]);
+  var rowCount = 1; 
+  // For each full week
+  for(var i = 0; i < differenceInDays; i += 7){
+    //Logger.log("Start Date:" + date.getDate());
+    var weekStartDate = Utilities.formatDate(date, timezone, "yyyy-MM-dd");
+    var weekEndDate = new Date(date);
+    weekEndDate.setDate(weekEndDate.getDate() + 7);
+    weekEndDate = Utilities.formatDate(weekEndDate, timezone, "yyyy-MM-dd");
+    //Logger.log(weekEndDate);
+    Logger.log(date);
+
+    var weekLabel = weekStartDate + " - " + weekEndDate;
+    var weekReceived = '=COUNTIFs(Sheet1!E2:E, ">=' + weekStartDate +'", Sheet1!E2:E, "<' + weekEndDate +'", Sheet1!B2:B,+16474905177, Sheet1!D2:D, "received")';
+    var weekTotal = '=COUNTIFs(Sheet1!E2:E, ">=' + weekStartDate +'", Sheet1!E2:E, "<' + weekEndDate +'", Sheet1!B2:B,+16474905177)';
+
+    receiSheet.appendRow([weekLabel, weekReceived, weekTotal]);
+    rowCount++;
+    weekStartDate = Utilities.formatDate(date, timezone, "MM/dd/yyyy");
+    weekEndDate = new Date(date);
+    weekEndDate.setDate(weekEndDate.getDate() + 7);
+    weekEndDate = Utilities.formatDate(weekEndDate, timezone, "MM/dd/yyyy");
+
+    receiSheet.getRange(rowCount + 1, 1).setValue('=QUERY(Sheet1!A2:E,"select C, A, E where B = \'+16474905177\' and E >= date \'"&TEXT(DATEVALUE("'+ weekStartDate + '"),"yyyy-mm-dd")&"\' and E < date \'"&TEXT(DATEVALUE("'+ weekEndDate + '"),"yyyy-mm-dd")&"\'" )');
+
+  var range = receiSheet.getRange(rowCount + 1, 1, receiSheet.getLastRow() - rowCount);
+  range.shiftRowGroupDepth(1);
+  var group = receiSheet.getRowGroup(rowCount + 1, 1);
+
+  // Collapses this group.
+  group.collapse();
+  rowCount = receiSheet.getLastRow();
+  date.setDate(date.getDate() + 7);
+  }
+}
+
+/* Actual Append function
+ * Appends this week's information to the Delivered and Received sheet
+ */
+
+// Global Variables
+const spreadSheetId='1mq49hIoSb0lSTDTRxXRhMglXpkPMvR8biznrNEX32uo';
+const timezone = "Etc/UTC";
+
+var sheetname; // Sheet name of the Newly imported sheet
+var oldSheetName; // Sheet name of the last imported sheet
+var ss; // Spreadsheet
+var newData; // Newly imported sheet
+var delivSheet; // Delivered Sheet
+var receiSheet; // Recieved Sheet
+
+// Initialize Variables and Cut the newly imported Sheet
+function prepNewSheet(){
+  // Since data is organized by week, get the This Monday
+  var monday = new Date(); // Today
+  var dayOfWeek = monday.getDay(); // Get the current day of the week (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+  var daysToSubtract = (dayOfWeek + 6) % 7; // Calculate the number of days to subtract to reach the previous Monday
+  monday.setDate(monday.getDate() - daysToSubtract); // Subtract the days to get the last Monday
+  // Logger.log(monday);
+  sheetname = Utilities.formatDate(monday, timezone, "yyyy-MM-dd"); // This Monday, should be the name of the Sheet just uploaded
+  Logger.log(sheetname);
+  monday.setDate(monday.getDate() - 7); // Get last Monday
+  oldSheetName =  Utilities.formatDate(monday, timezone, "yyyy-MM-dd"); // Should be the sheet uploaded last week
+
+  // Initialize Variables
+  ss = SpreadsheetApp.openById(spreadSheetId);
+  delivSheet = ss.getSheetByName('Delivered');
+  receiSheet = ss.getSheetByName('Received');
+  newData = ss.getSheetByName(sheetname);
+  oldData = ss.getSheetByName(oldSheetName);
+
+  // In case there is no sheet uploaded last Monday, keep looping back in Mondays until you find a valid sheet
+  while(oldData == null){ 
+    monday.setDate(monday.getDate() - 7); // Get last Monday
+    oldSheetName =  Utilities.formatDate(monday, timezone, "yyyy-MM-dd");
+    oldData = ss.getSheetByName(oldSheetName);
+  }
+
+  // find row number to cut
+  monday.setDate(monday.getDate() - 1);
+  var tosearch = Utilities.formatDate(monday, timezone, "yyyy-MM-dd");
+  // tosearch = '2023-07-22';
+   Logger.log(tosearch);
+  var tf = newData.createTextFinder(tosearch);
+  var all = tf.findAll();
+  
+  // Deals with exception where no donors are aquired for Last last Sunday
+  while(all.length == 0){
+    monday.setDate(monday.getDate() - 1);
+    tosearch = Utilities.formatDate(monday, timezone, "yyyy-MM-dd");
+    // tosearch = '2023-07-22';
+    Logger.log(tosearch);
+    tf = newData.createTextFinder(tosearch);
+    all = tf.findAll();
+  }
+  
+  var rowNumber = all[0].getA1Notation();
+  rowNumber = rowNumber.replace(/^\D+/g, ''); // Replace all leading non-digits with nothing
+  // Logger.log(rowNumber);
+
+  // Cuts all previoius entries from the new sheet
+  var lastRow = newData.getLastRow();
+  if (rowNumber < lastRow) {
+    var numRowsToDelete = lastRow - rowNumber + 1;
+    newData.deleteRows(rowNumber, numRowsToDelete);
+  }
+
+  // Text to columns, split date and time into different columns
+  var range = newData.getRange("E2:E" + lastRow);
+  range.splitTextToColumns('T');
+}
+
+// Appeands new Rows to Delivered sheet using the new sheet
+function appendDelivered() {
+  // Week row 
+  var weekStartDate = oldSheetName;
+  var weekEndDate = sheetname;
+  var rowCount = delivSheet.getLastRow();
+  var weekLabel = weekStartDate + " - " + weekEndDate;
+  var weekDelivered = '=SUM(B' + (rowCount + 2) + ':B' + (rowCount + 8) + ')';
+  var weekUndelivered = '=SUM(C' + (rowCount + 2) + ':C' + (rowCount + 8) + ')';
+  var weekTotal = '=SUM(D' + (rowCount + 2) + ':D' + (rowCount + 8) + ')';
+
+  delivSheet.appendRow([weekLabel, weekDelivered, weekUndelivered, weekTotal]);
+  rowCount++;
+  
+  // For everyday of the week
+  var date = new Date(weekStartDate);
+  for(var j = 0; j < 7; j++){
+    // Day row
+    var dateFormat = Utilities.formatDate(date, timezone, "yyyy-MM-dd");
+    var delivered = '=COUNTIFs(\''+ sheetname + '\'!E2:E, "=' + dateFormat +'",  \''+ sheetname + '\'!A2:A,+16474905177, \'' + sheetname + '\'!D2:D, "delivered", \'' + sheetname + '\'!C2:C, "*thanks for becoming a SickKids*")';
+    var undelivered = '=COUNTIFs(\'' + sheetname+ '\'!E2:E, "=' + dateFormat +'", \'' + sheetname + '\'!A2:A,+16474905177, \'' + sheetname + '\'!D2:D, "undelivered", \'' + sheetname + '\'!C2:C, "*thanks for becoming a SickKids*")';
+    var total = '=COUNTIFs(\'' + sheetname + '\'!E2:E, "=' + dateFormat +'", \'' + sheetname + '\'!A2:A,+16474905177, \'' + sheetname + '\'!C2:C, "*thanks for becoming a SickKids*")';
+
+    delivSheet.appendRow([dateFormat, delivered, undelivered, total]);
+
+    rowCount++;
+    date.setDate(date.getDate() + 1);
+  }
+
+  // Group and Collapse rows
+  var range = delivSheet.getRange(rowCount - 6, 1, 7);
+  range.shiftRowGroupDepth(1);
+  var group = delivSheet.getRowGroup(rowCount - 6, 1);
+  group.collapse();
+}
+
+// Appends new Rosw to Recieved Sheet
+function appendRecieved() {
+  // Week row
+  var weekStartDate = oldSheetName;
+  var weekEndDate = sheetname;
+  var rowCount = receiSheet.getLastRow();
+  var weekLabel = weekStartDate + " - " + weekEndDate;
+  var weekReceived = '=COUNTIFs(\'' + sheetname + '\'!E2:E, ">=' + weekStartDate +'", \'' + sheetname + '\'!E2:E, "<' + weekEndDate +'", \'' + sheetname + '\'!B2:B,+16474905177, \'' + sheetname + '\'!D2:D, "received")';
+  var weekTotal = '=COUNTIFs(\'' + sheetname + '\'!E2:E, ">=' + weekStartDate +'", \'' + sheetname + '\'!E2:E, "<' + weekEndDate +'", \'' + sheetname + '\'!B2:B,+16474905177)';
+
+  receiSheet.appendRow([weekLabel, weekReceived, weekTotal]);
+  rowCount++;
+
+  // Each Indivisual message gets a row
+  receiSheet.getRange(rowCount + 1, 1).setValue('=QUERY(\'' + sheetname + '\'!A2:E,"select C, A, E where B = \'+16474905177\' and E >= date \'"&TEXT(DATEVALUE("'+ weekStartDate + '"),"yyyy-mm-dd")&"\' and E < date \'"&TEXT(DATEVALUE("'+ weekEndDate + '"),"yyyy-mm-dd")&"\'" )');
+
+  // Group and collapse rows
+  var range = receiSheet.getRange(rowCount + 1, 1, receiSheet.getLastRow() - rowCount);
+  range.shiftRowGroupDepth(1);
+  var group = receiSheet.getRowGroup(rowCount + 1, 1);
+  group.collapse();
+  rowCount = receiSheet.getLastRow();
+}
+
+// Groups all append Actions
+function appendAction(){
+  prepNewSheet();
+  appendDelivered();
+  appendRecieved();
+}
+
+// Creates UI
+function onOpen(e){
+  SpreadsheetApp.getUi()
+  .createMenu('Script Functions')
+  .addItem('Append', 'appendAction')
+  .addItem('Create Delivered', 'createDelivered')
+  .addItem('Create Recieved', 'createRecieved')
+  .addToUi();
+}
